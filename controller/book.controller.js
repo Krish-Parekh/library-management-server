@@ -6,23 +6,19 @@ const bookSchema = z.object({
   description: z.string().min(10),
   author: z.string().min(3),
   isbn: z.string().length(13),
-  categaory: z.enum([
-    "fiction",
-    "non-fiction",
-    "fantasy",
-    "biography",
-    "self-help",
-  ]),
+  category: z.string(),
 });
 
 const createBook = async (req, res) => {
   try {
-    const { title, description, author, isbn, category } = bookSchema.safeParse(
+    const result = bookSchema.safeParse(
       req.body
     );
+    console.log(result.data)
     if (!result.success) {
       return res.status(400).json({ errors: result.error.errors });
     }
+    const { title, description, author, isbn, category } = result.data;
 
     const book = new Book({ title, description, author, isbn, category });
     await book.save();
