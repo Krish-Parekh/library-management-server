@@ -1,24 +1,7 @@
 import { User } from "../model/user.model.js";
 import { ApiError } from "../util/ApiError.js";
 import { ApiResponse } from "../util/ApiResponse.js";
-import { z } from "zod";
-
-const userSchema = z.object({
-  username: z.string().min(3).max(255),
-  email: z.string().email(),
-  password: z.string().min(6),
-});
-
-const getAllUser = async (req, res) => {
-  try {
-    const users = await User.find({}, { password: 0 }).catch((error) => {
-      throw new ApiError(500, "Failed to retrieve users. Please try again.");
-    });
-    return res.status(200).json(new ApiResponse(200, users, "Users retrieved successfully."));
-  } catch (error) {
-    return res.json(new ApiResponse(error.status, error.message));
-  }
-};
+import { userSchema } from "../util/schema/user.schema.js";
 
 const getUser = async (req, res) => {
   try {
@@ -26,17 +9,36 @@ const getUser = async (req, res) => {
     if (!id) {
       throw new ApiError(400, "User ID is required");
     }
+
     const user = await User.findById(id).catch((error) => {
       throw new ApiError(404, "Failed to retrieve user. Please try again.");
     });
     if (!user) {
       throw new ApiError(404, "User not found");
     }
+
     return res
       .status(200)
       .json(new ApiResponse(200, user, "User retrieved successfully."));
   } catch (error) {
-    return res.json(new ApiResponse(error.status, error.message));
+    return res
+      .status(error.statusCode || 500)
+      .json({ message: error.message, success: false });
+  }
+};
+
+const getAllUser = async (req, res) => {
+  try {
+    const users = await User.find({}, { password: 0 }).catch((error) => {
+      throw new ApiError(500, "Failed to retrieve users. Please try again.");
+    });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, users, "Users retrieved successfully."));
+  } catch (error) {
+    return res
+      .status(error.statusCode || 500)
+      .json({ message: error.message, success: false });
   }
 };
 
@@ -49,8 +51,7 @@ const updateUser = async (req, res) => {
 
     const result = userSchema.safeParse(req.body);
     if (!result.success) {
-      const messages = result.error.errors.map((error) => error.message);
-      throw new ApiError(400, messages.join(", "));
+      throw new ApiError(400, "Error validating request data.");
     }
 
     const user = await User.findByIdAndUpdate(id, result.data, {
@@ -68,7 +69,9 @@ const updateUser = async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, user, "User updated successfully."));
   } catch (error) {
-    return res.json(new ApiResponse(error.status, error.message));
+    return res
+      .status(error.statusCode || 500)
+      .json({ message: error.message, success: false });
   }
 };
 
@@ -79,7 +82,7 @@ const deleteUser = async (req, res) => {
       throw new ApiError(400, "User ID is required");
     }
 
-    const user = await User.findByIdAndDelete(req.params.id).catch((error) => {
+    const user = await User.findByIdAndDelete(id).catch((error) => {
       throw new ApiError(404, "Failed to delete user. Please try again.");
     });
     if (!user) {
@@ -90,7 +93,9 @@ const deleteUser = async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, "User deleted successfully."));
   } catch (error) {
-    return res.json(new ApiResponse(error.status, error.message));
+      return res
+        .status(error.statusCode || 500)
+        .json({ message: error.message, success: false });
   }
 };
 
