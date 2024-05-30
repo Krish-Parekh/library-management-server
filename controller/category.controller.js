@@ -4,50 +4,67 @@ import { ApiResponse } from "../util/ApiResponse.js";
 import { z } from "zod";
 
 const categorySchema = z.object({
-  name: z.string().min(3, { message: "Name must be at least 3 characters" }),
+  name: z
+    .string({
+      message: "Name can't be processed",
+    })
+    .min(3, { message: "Name must be at least 3 characters" }),
+  userId: z.string({
+    message: "UserID can't be processed",
+  }),
 });
 
 const createCategory = async (req, res) => {
   try {
     const result = categorySchema.safeParse(req.body);
     if (!result.success) {
-      throw new ApiError(400, result.error.errors.join(", "));
+      const messages = result.error.errors.map((error) => error.message);
+      throw new ApiError(400, messages.join(", "));
     }
     const { name, userId } = result.data;
 
     const category = new Category({ name, userId });
-    await category.save();
+    await category.save().catch((error) => {
+      throw new ApiError(400, "Failed to create category. Please try again.");
+    });
     return res
       .status(201)
       .json(new ApiResponse(201, category, "Category created successfully."));
   } catch (error) {
-    throw new ApiError(400, error.message);
+    return res.json(new ApiResponse(error.status, error.message));
   }
 };
 
 const getCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
+    const categories = await Category.find().catch((error) => {
+      throw new ApiError(
+        500,
+        "Failed to retrieve categories. Please try again."
+      );
+    });
     return res.status(200).json(new ApiResponse(200, categories));
   } catch (error) {
-    throw new ApiError(400, error.message);
+    return res.json(new ApiResponse(error.status, error.message));
   }
 };
 
 const getCategory = async (req, res) => {
   try {
-    const { id } = req.params.id;
+    const { id } = req.params;
     if (!id) {
       throw new ApiError(400, "Category ID is required");
     }
 
-    const category = await Category.findById(req.params.id);
+    const category = await Category.findById(id).catch((error) => {
+      throw new ApiError(404, "Failed to retrieve category. Please try again.");
+    });
     if (!category) {
       throw new ApiError(404, "Category not found");
     }
     return res.status(200).json(new ApiResponse(200, category));
   } catch (error) {
-    throw new ApiError(400, error.message);
+    return res.json(new ApiResponse(error.status, error.message));
   }
 };
 
@@ -55,7 +72,8 @@ const updateCategory = async (req, res) => {
   try {
     const result = categorySchema.safeParse(req.body);
     if (!result.success) {
-      throw new ApiError(400, result.error.errors.join(", "));
+      const messages = result.error.errors.map((error) => error.message);
+      throw new ApiError(400, messages.join(", "));
     }
 
     const category = await Category.findByIdAndUpdate(
@@ -65,7 +83,9 @@ const updateCategory = async (req, res) => {
         new: true,
         runValidators: true,
       }
-    );
+    ).catch((error) => {
+      throw new ApiError(404, "Failed to update category. Please try again.");
+    });
 
     if (!category) {
       throw new ApiError(404, "Category not found");
@@ -75,7 +95,7 @@ const updateCategory = async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, category, "Category updated successfully."));
   } catch (error) {
-    throw new ApiError(400, error.message);
+    return res.json(new ApiResponse(error.status, error.message));
   }
 };
 
@@ -86,7 +106,9 @@ const deleteCategory = async (req, res) => {
       throw new ApiError(400, "Category ID is required");
     }
 
-    const category = await Category.findByIdAndDelete(req.params.id);
+    const category = await Category.findByIdAndDelete(id).catch((error) => {
+      throw new ApiError(404, "Failed to delete category. Please try again.");
+    });
     if (!category) {
       throw new ApiError(404, "Category not found");
     }
@@ -95,8 +117,14 @@ const deleteCategory = async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, "Category deleted successfully."));
   } catch (error) {
-    throw new ApiError(400, error.message);
+    return res.json(new ApiResponse(error.status, error.message));
   }
 };
 
-export { createCategory, getCategories, getCategory, updateCategory, deleteCategory };
+export {
+  createCategory,
+  getCategories,
+  getCategory,
+  updateCategory,
+  deleteCategory,
+};

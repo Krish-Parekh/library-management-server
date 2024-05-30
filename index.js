@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import helmet from "helmet";
 import { connectDB } from "./lib/db.js";
 
 const app = express();
@@ -8,6 +9,9 @@ const app = express();
 dotenv.config();
 app.use(express.json());
 app.use(cors());
+app.use(helmet());
+
+app.disable("x-powered-by");
 
 import authRouter from "./router/auth.router.js";
 import userRouter from "./router/user.router.js";

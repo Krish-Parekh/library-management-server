@@ -13,12 +13,11 @@ const bookSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    authorId: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-      },
-    ],
+    authorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Author",
+    },
     isbn: {
       type: String,
       required: true,
@@ -30,10 +29,12 @@ const bookSchema = new mongoose.Schema(
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "Category",
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "User",
     },
   },
   { timestamps: true }
