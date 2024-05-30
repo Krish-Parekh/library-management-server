@@ -12,6 +12,8 @@ app.use(cors());
 import authRouter from "./router/auth.router.js";
 import userRouter from "./router/user.router.js";
 import bookRouter from "./router/book.router.js";
+import authorRouter from "./router/author.router.js";
+import categoryRouter from "./router/category.router.js";
 
 import { verifyToken } from "./middleware/auth.middleware.js";
 
@@ -22,6 +24,8 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", verifyToken, userRouter);
 app.use("/api/v1/book", verifyToken, bookRouter);
+app.use("/api/v1/author", verifyToken, authorRouter);
+app.use("/api/v1/category", verifyToken, categoryRouter);
 
 connectDB()
   .then(() => {

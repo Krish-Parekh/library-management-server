@@ -5,24 +5,35 @@ const bookSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      unique: true,
+      trim: true,
     },
     description: {
       type: String,
       required: true,
+      trim: true,
     },
-    author: {
-      type: String,
-      required: true,
-    },
+    authorId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+      },
+    ],
     isbn: {
       type: String,
       required: true,
       unique: true,
+      trim: true,
+      minlength: 13,
+      maxlength: 13,
     },
-    category: {
-      type: String,
+    categoryId: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
-      enum: ["fiction", "non-fiction", "fantasy", "biography", "self-help"],
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
     },
   },
   { timestamps: true }
