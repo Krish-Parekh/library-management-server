@@ -38,8 +38,21 @@ const createBook = async (req, res) => {
 
 const getBooks = async (req, res) => {
   try {
-    const books = await Book.find()
-      .populate({ path: "authorId", select: "name" })
+    const { search } = req.query;
+
+    let filter = {};
+
+    if (search) {
+      filter = {
+        $or: [
+          { title: { $regex: search, $options: "i" } },
+          { description: { $regex: search, $options: "i" } },
+        ],
+      };
+    }
+    
+    const books = await Book.find(filter)
+      .populate({ path: "authorId", select: "name",  })
       .populate({ path: "categoryId", select: "name" })
       .populate({ path: "userId", select: "username email role" })
       .catch((error) => {
@@ -88,7 +101,7 @@ const getBookById = async (req, res) => {
 const updateBook = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     if (!id) {
       throw new ApiError(400, "Book ID is required");
     }
