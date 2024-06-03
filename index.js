@@ -46,20 +46,23 @@ app.get(
   }
 );
 
+const httpsServer = https.createServer(httpsOptions, app);
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", verifyToken, userRouter);
 app.use("/api/v1/book", verifyToken, bookRouter);
 app.use("/api/v1/author", verifyToken, authorRouter);
 app.use("/api/v1/category", verifyToken, categoryRouter);
 
-const httpsServer = https.createServer(httpsOptions, app);
-httpsServer.listen(3000, app)
-
 connectDB()
   .then(() => {
-    app.listen(process.env.PORT, () => {
-      console.log(`Server is running on port ${process.env.PORT}`);
+    httpsServer.listen(8000, () => {
+      console.log(`Server is running on port 8000`);
     });
+
+    // app.listen(process.env.PORT, () => {
+    //   console.log(`Server is running on port ${process.env.PORT}`);
+    // });
   })
   .catch((err) => {
     console.log("MONGO DB connection failed !!! ", err);
