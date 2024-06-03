@@ -4,12 +4,20 @@ import cors from "cors";
 import helmet from "helmet";
 import { connectDB } from "./lib/db.js";
 import fs from "fs";
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from "path";
+import { fileURLToPath } from "url";
+import https from "https";
 
-const __filename = fileURLToPath(import.meta.url); 
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const key = fs.readFileSync(path.join(__dirname, "private.key"));
+const cert = fs.readFileSync(path.join(__dirname, "certificate.crt"));
+
+const httpsOptions = {
+  key: key,
+  cert: cert,
+};
 
 const app = express();
 dotenv.config();
@@ -31,15 +39,21 @@ app.get("/", (req, res) => {
   res.status(200).json({ message: "Server is running" });
 });
 
-app.get("/.well-known/pki-validation/3CE78B620E7B3C6A4C4C814502D974F8.txt", (req, res) => {
- res.sendFile(path.join(__dirname, '3CE78B620E7B3C6A4C4C814502D974F8.txt')); 
-})
+app.get(
+  "/.well-known/pki-validation/3CE78B620E7B3C6A4C4C814502D974F8.txt",
+  (req, res) => {
+    res.sendFile(path.join(__dirname, "3CE78B620E7B3C6A4C4C814502D974F8.txt"));
+  }
+);
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", verifyToken, userRouter);
 app.use("/api/v1/book", verifyToken, bookRouter);
 app.use("/api/v1/author", verifyToken, authorRouter);
 app.use("/api/v1/category", verifyToken, categoryRouter);
+
+const httpsServer = https.createServer(httpsOptions, app);
+httpsServer.listen(3000, app)
 
 connectDB()
   .then(() => {
