@@ -49,13 +49,20 @@ const updateUser = async (req, res) => {
       throw new ApiError(400, "User ID is required");
     }
 
-    const result = userSchema.safeParse(req.body);
-    if (!result.success) {
-      throw new ApiError(400, "Error validating request data.");
+    const { username, email } = req.body;
+
+    if (!username || !email) {
+      throw new ApiError(400, "Request data is required.");
     }
 
-    const user = await User.findByIdAndUpdate(id, result.data, {
-      new: true,
+    const user = await User.findById(id).catch((error) => {
+      throw new ApiError(404, "Failed to update user. Please try again.");
+    });
+
+    user.username = username;
+    user.email = email;
+
+    await User.updateOne({ _id: id }, user, {
       runValidators: true,
     }).catch((error) => {
       throw new ApiError(404, "Failed to update user. Please try again.");
@@ -93,9 +100,9 @@ const deleteUser = async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, "User deleted successfully."));
   } catch (error) {
-      return res
-        .status(error.statusCode || 500)
-        .json({ message: error.message, success: false });
+    return res
+      .status(error.statusCode || 500)
+      .json({ message: error.message, success: false });
   }
 };
 
