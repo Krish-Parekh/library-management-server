@@ -11,4 +11,14 @@ const signupSchema = z.object({
   password: z.string().min(6),
 });
 
-export { loginSchema, signupSchema };
+const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+const resetPasswordSchema = z.object({
+  userId: z.string(),
+  token: z.string(),
+  password: z.string().min(6),
+})
+
+export { loginSchema, signupSchema, forgotPasswordSchema, resetPasswordSchema };
