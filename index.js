@@ -11,6 +11,7 @@ import https from "https";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+
 const key = fs.readFileSync(path.join(__dirname, "private.key"));
 const cert = fs.readFileSync(path.join(__dirname, "certificate.crt"));
 
@@ -34,6 +35,7 @@ import authorRouter from "./router/author.router.js";
 import categoryRouter from "./router/category.router.js";
 
 import { verifyToken } from "./middleware/auth.middleware.js";
+import { downloadBook } from "./controller/book.controller.js";
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Server is running" });
@@ -53,16 +55,18 @@ app.use("/api/v1/user", verifyToken, userRouter);
 app.use("/api/v1/book", verifyToken, bookRouter);
 app.use("/api/v1/author", verifyToken, authorRouter);
 app.use("/api/v1/category", verifyToken, categoryRouter);
+app.get("/api/v1/download/", downloadBook);
+
 
 connectDB()
   .then(() => {
-    httpsServer.listen(8000, () => {
-      console.log(`Server is running on port 8000`);
-    });
-
-    // app.listen(process.env.PORT, () => {
-    //   console.log(`Server is running on port ${process.env.PORT}`);
+    // httpsServer.listen(8000, () => {
+    //   console.log(`Server is running on port 8000`);
     // });
+
+    app.listen(process.env.PORT, () => {
+      console.log(`Server is running on port ${process.env.PORT}`);
+    });
   })
   .catch((err) => {
     console.log("MONGO DB connection failed !!! ", err);

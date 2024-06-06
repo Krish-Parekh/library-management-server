@@ -2,6 +2,11 @@ import { Book } from "../model/book.model.js";
 import { ApiError } from "../util/ApiError.js";
 import { ApiResponse } from "../util/ApiResponse.js";
 import { bookSchema } from "../util/schema/book.schema.js";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+
+
 
 const createBook = async (req, res) => {
   try {
@@ -150,4 +155,26 @@ const deleteBook = async (req, res) => {
   }
 };
 
-export { createBook, getBooks, getBookById, updateBook, deleteBook };
+const downloadBook = async(req, res) => {
+  try {
+    const s3Client = new S3Client({
+      region: process.env.AWS_S3_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
+    });
+
+    const signedUrlExpireSeconds = 60 * 60; // 1 hour
+    let command = new GetObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: process.env.AWS_FILE_KEY,
+    })
+    let url = await getSignedUrl(s3Client, command, { expiresIn: signedUrlExpireSeconds });
+    return res.redirect(url);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export { createBook, getBooks, getBookById, updateBook, deleteBook, downloadBook };
