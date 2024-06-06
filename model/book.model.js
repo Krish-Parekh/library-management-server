@@ -7,11 +7,15 @@ const bookSchema = new mongoose.Schema(
       required: true,
       unique: true,
       trim: true,
+      minlength: 1,
+      maxlength: 500,
     },
     description: {
       type: String,
       required: true,
       trim: true,
+      minlength: 10,
+      maxlength: 1000,
     },
     authorId: {
       type: mongoose.Schema.Types.ObjectId,

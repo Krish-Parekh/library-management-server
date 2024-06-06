@@ -6,12 +6,14 @@ const authorSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      minlength: 3,
+      minlength: 1,
       maxlength: 255,
     },
     description: {
       type: String,
       required: true,
+      minlength: 10,
+      maxlength: 1000,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
