@@ -30,8 +30,8 @@ Make sure you have the following installed:
 1. Clone the repository:
 
 ```sh
-git clone <repository-url>
-cd <repository-name>
+git clone https://github.com/Krish-Parekh/library-management-server.git
+cd library-management-server
 ```
 
 2. Install the dependencies:
