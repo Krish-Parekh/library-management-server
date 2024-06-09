@@ -91,7 +91,7 @@ app.listen(process.env.PORT, () => {
 3. Start the server:
 
 ```sh
-npm start
+nodemon index.js
 ```
 
 #### Production (HTTPS)
@@ -115,7 +115,7 @@ const httpsServer = https.createServer(httpsOptions, app);
 3. Start the server:
 
 ```sh
-npm start
+pm2 start index.js
 ```
 
 ### File Structure
