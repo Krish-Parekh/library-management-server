@@ -44,6 +44,8 @@ npm install
 
 Create a `.env` file in the root directory of your project and add the following environment variables:
 
+- CLIENT_URL: For Development would be your localhost URL, and for Production your client domain.
+
 ```env
 MONGO_DB_URI=mongodb://localhost:27017/your-database-name
 PORT=8000
