@@ -44,20 +44,26 @@ npm install
 
 Create a `.env` file in the root directory of your project and add the following environment variables:
 
-- CLIENT_URL: For Development would be your localhost URL, and for Production your client domain.
+- For Development:
+  - PORT = 5000
+  - CLIENT_URL = http://localhost:3000
+
+- For Production:
+  - PORT = 8000
+  - CLIENT_URL = https://main.d34xp5l8s3t11r.amplifyapp.com
 
 ```env
-MONGO_DB_URI=mongodb://localhost:27017/your-database-name
-PORT=8000
-JWT_SECRET=your_jwt_secret
-CLIENT_URL=your_client_url
-EMAIL_USERNAME=your_email_username
-EMAIL_PASSWORD=your_email_password
-AWS_S3_REGION=your_aws_s3_region
-AWS_ACCESS_KEY_ID=your_aws_access_key_id
-AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
-AWS_BUCKET_NAME=your_aws_bucket_name
-AWS_FILE_KEY=your_aws_file_key
+MONGO_DB_URI=
+PORT=
+JWT_SECRET=
+CLIENT_URL=
+EMAIL_USERNAME=
+EMAIL_PASSWORD=
+AWS_S3_REGION=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_BUCKET_NAME=
+AWS_FILE_KEY=
 ```
 
 4. Generate SSL certificates for HTTPS:
@@ -78,6 +84,9 @@ To run the server in development mode using HTTP:
 
 ```javascript
 // const httpsServer = https.createServer(httpsOptions, app);
+// httpsServer.listen(8000, () => {
+//   console.log(`Server is running on port 8000`);
+// });
 ```
 
 2. Uncomment the HTTP server code:
@@ -102,6 +111,9 @@ To run the server in production mode using HTTPS:
 
 ```javascript
 const httpsServer = https.createServer(httpsOptions, app);
+httpsServer.listen(8000, () => {
+  console.log(`Server is running on port 8000`);
+});
 ```
 
 2. Comment out the HTTP server code:
@@ -145,11 +157,12 @@ pm2 start index.js
   │   ├── author.router.js
   │   ├── category.router.js
   │   └── user.router.js
-  ├── schema/
-  │   ├── user.schema.js
-  │   ├── book.schema.js
-  │   ├── author.schema.js
-  │   ├── category.schema.js
+  ├── util
+  │   ├── schema/
+  │       ├── user.schema.js
+  │       ├── book.schema.js
+  │       ├── author.schema.js
+  │       ├── category.schema.js
   ├── .env
   ├── certificate.crt
   ├── private.key
