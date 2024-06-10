@@ -218,3 +218,22 @@ pm2 start index.js
 
 - Make sure to update the `.env` file with your actual configuration.
 - For HTTPS, ensure your SSL certificates (`private.key` and `certificate.crt`) are correctly placed in the root directory.
+
+## Contributing
+
+If you want to contribute to this project, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-branch`).
+3. Make your changes.
+4. Commit your changes (`git commit -am 'Add new feature'`).
+5. Push to the branch (`git push origin feature-branch`).
+6. Create a new Pull Request.
+
+## License
+
+This project is licensed under the MIT License.
+
+---
+
+This README file provides an overview of the Next.js application with instructions for installation, usage, and deployment. If you have any questions or need further assistance, feel free to open an issue on the repository.
